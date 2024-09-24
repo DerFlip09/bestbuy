@@ -1,13 +1,21 @@
 import products
-from store import Store
+import store
 
-product_list = [products.Product("MacBook Air M2", price=1450, quantity=100),
-                products.Product("Bose QuietComfort Earbuds", price=250, quantity=500),
-                products.Product("Google Pixel 7", price=500, quantity=250),
+
+# setup initial stock of inventory
+product_list = [ products.Product("MacBook Air M2", price=1450, quantity=100),
+                 products.Product("Bose QuietComfort Earbuds", price=250, quantity=500),
+                 products.Product("Google Pixel 7", price=500, quantity=250)
                ]
 
-store = Store(product_list)
-products = store.get_all_products()
-print(store.get_total_quantity())
-print(store.order([(products[0], 1), (products[1], 2)]))
-print(store.get_total_quantity())
+best_buy = store.Store(product_list)
+
+def start(store_obj):
+    print(f"   Store Menu\n"
+          f"   {10 * "-"}\n"
+          f"1. List all products in store\n"
+          f"2. Show total amount in store\n"
+          f"3. Make an order\n"
+          f"4. Quit")
+    user_input = int(input("Please choose a number: "))
+
