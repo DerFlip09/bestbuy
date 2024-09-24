@@ -35,4 +35,4 @@ class Product:
             self.set_quantity(-quantity)
         except ValueError as e:
             print(e)
-        return f"Total price: {self.price * quantity}$"
+        return self.price * quantity
