@@ -24,5 +24,8 @@ class Store:
     def order(self, shopping_list):
         total_price = 0
         for product, quantity in shopping_list:
-            total_price += product.buy(quantity)
+            try:
+                total_price += product.buy(quantity)
+            except ValueError as e:
+                return e
         return total_price

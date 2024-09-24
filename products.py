@@ -12,11 +12,12 @@ class Product:
 
     def set_quantity(self, quantity):
         if self.quantity + quantity < 0:
-            raise ValueError("There is not enough product in stock!")
+            print("There is not enough product in stock!")
         else:
             self.quantity += quantity
             if self.quantity == 0:
                 self.active = False
+            return True
 
     def is_active(self):
         return self.active
@@ -31,8 +32,6 @@ class Product:
         print(f"{self.name}, Price: {self.price}$, Quantity: {self.quantity}")
 
     def buy(self, quantity):
-        try:
-            self.set_quantity(-quantity)
-        except ValueError as e:
-            print(e)
+        if not self.set_quantity(-quantity):
+            raise ValueError("Not enough items in stock")
         return self.price * quantity
