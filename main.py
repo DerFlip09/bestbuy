@@ -5,15 +5,22 @@ import store
 
 def print_menu(command_dispatcher):
     """
-    Displays the menu of available commands in the CLI.
+    Prints the store menu using the command dispatcher.
+
+    :param command_dispatcher: Dictionary mapping command numbers to their descriptions and functions.
     """
     print(f"   Store Menu\n"
-          f"   {10 * "-"}")
+          f"   {10 * '-'}")
     for command_number, command_info in command_dispatcher.items():
         print(f"{command_number}. {command_info['description']}")
 
 
 def start(store_obj):
+    """
+    Main loop for the store program, handling user input and executing corresponding functions.
+
+    :param store_obj: Store object containing products.
+    """
     command_dispatcher = {1: {"description": "List all products in store", "function": show_items},
                           2: {"description": "Show total amount in store", "function": show_total_amount},
                           3: {"description": "Make an order", "function": place_an_order},
@@ -22,7 +29,7 @@ def start(store_obj):
     while True:
         print_menu(command_dispatcher)
         try:
-            user_input = int(input("Please choose a number: "))
+            user_input = int(input("Please choose a number: ").strip())
         except ValueError:
             print("Please enter a number!")
             continue
@@ -35,6 +42,9 @@ def start(store_obj):
 
 
 def main():
+    """
+    Initializes the product list and store, then starts the store interface.
+    """
     try:
         product_list = [products.Product("MacBook Air M2", price=1450, quantity=100),
                         products.Product("Bose QuietComfort Earbuds", price=250, quantity=500),
@@ -49,3 +59,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+
