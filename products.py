@@ -9,12 +9,30 @@ class Product:
     """
 
     def __init__(self, name, price, quantity):
+
+        # Error handling name
+        if not isinstance(name, str):
+            raise TypeError(f"Name needs to be a string: {type(name).__name__} was given")
+        if not name.strip():
+            raise ValueError("Name cannot be empty")
+
+        # Error handling price
+        if not isinstance(price, (float, int)):
+            raise TypeError(f"Price needs to be an integer or a float number: {type(price).__name__} was given")
+        if price < 0:
+            raise ValueError("Price needs to be positive")
+
+        # Error handling quantity
+        if not isinstance(quantity, int):
+            raise TypeError(f"Quantity needs to be an integer: {type(quantity).__name__} was given")
+        if quantity < 0:
+            raise ValueError("Quantity needs to be positive")
+
+        # Instance Variables
         self.name = name
         self.price = float(price)
-        self.quantity = quantity
         self.active = True
-        if name == "" or price < 0 or quantity < 0:
-            raise ValueError("The product information is wrong. Give valid input.")
+        self.quantity = self.set_quantity(quantity)
 
     def get_quantity(self):
         """
@@ -31,13 +49,14 @@ class Product:
         :param quantity: Quantity to add/subtract from the current stock.
         :return: True if the quantity was updated, False if not enough in stock.
         """
-        if self.quantity + quantity < 0:
-            print("There is not enough product in stock!")
-        else:
-            self.quantity += quantity
-            if self.quantity == 0:
-                self.active = False
-            return True
+        if not isinstance(quantity, int):
+            raise TypeError(f"Quantity needs to be an integer: {type(quantity).__name__} was given")
+        if quantity < 0:
+            raise ValueError("Quantity needs to be positive")
+
+        self.quantity = quantity
+        if self.quantity == 0:
+            self.deactivate()
 
     def is_active(self):
         """
@@ -63,7 +82,7 @@ class Product:
         """
         Displays product details including name, price, and quantity.
         """
-        print(f"{self.name}, Price: {self.price}$, Quantity: {self.quantity}")
+        return f"{self.name}, Price: {self.price}$, Quantity: {self.quantity}"
 
     def buy(self, quantity):
         """
@@ -73,7 +92,15 @@ class Product:
         :return: Total price for the purchase.
         :raises ValueError: If not enough items are in stock.
         """
-        if not self.set_quantity(-quantity):
-            raise ValueError("Not enough items in stock")
-        return self.price * quantity
+        if not isinstance(quantity, int):
+            raise TypeError(f"Quantity needs to be an integer: {type(quantity).__name__} was given")
+        if quantity < 0:
+            raise ValueError("Quantity needs to be positive")
+        if not self.is_active():
+            raise TypeError(f"Product {self.name} is not active")
+        if quantity > self.quantity:
+            raise ValueError(f"Not enough quantity in stock for {self.name}")
 
+        total_price = self.price * quantity
+        self.set_quantity(self.quantity - quantity)
+        return total_price

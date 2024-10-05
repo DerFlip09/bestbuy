@@ -53,6 +53,8 @@ def place_an_order(store_obj):
                 continue
             order_list.append((product, quantity))
             print("Product added to list!\n")
-    print(order_list)
-    total_sum = store_obj.order(order_list)
-    print(f"{8 * '*'}\nOrder made! Total payment: {total_sum}")
+    if order_list:
+        total_sum = store_obj.order(order_list)
+        print(f"{8 * '*'}\nOrder made! Total payment: {total_sum}")
+    else:
+        print("Thanks for nothing")
