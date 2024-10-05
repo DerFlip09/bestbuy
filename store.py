@@ -70,7 +70,7 @@ class Store:
             if not product.is_active():
                 raise ValueError(f"{product.name} is not active in the store")
 
-            quantity = sum(prod for prod, quant in shopping_list if prod == product)
+            quantity = sum(quant for prod, quant in shopping_list if prod == product)
             if quantity > product.quantity:
                 raise ValueError(f"Quantity of purchase to high for {product.name}")
 
