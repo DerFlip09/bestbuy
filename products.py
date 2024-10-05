@@ -32,7 +32,7 @@ class Product:
         self.name = name
         self.price = float(price)
         self.active = True
-        self.quantity = quantity
+        self.set_quantity(quantity)
 
     def get_quantity(self):
         """
