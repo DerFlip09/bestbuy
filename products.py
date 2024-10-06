@@ -8,11 +8,11 @@ class Product:
     :param name: Name of the product.
     :param price: Price of the product.
     :param quantity: Quantity of the product in stock.
+    :raises TypeError: If the quantity is not an integer.
     :raises ValueError: If any of the input values are invalid.
     """
 
     def __init__(self, name, price, quantity):
-
         # Error handling name
         if not isinstance(name, str):
             raise TypeError(f"Name needs to be a string: {type(name).__name__} was given")
@@ -36,44 +36,57 @@ class Product:
         self._price = float(price)
         self._active = True
         self._member = None
-        self.quantity = quantity
+        self._quantity = quantity  # Corrected to set _quantity directly
 
     def __lt__(self, product):
+        """Check if the product is cheaper than another."""
         return self._price < product.price
 
     def __gt__(self, product):
+        """Check if the product is more expensive than another."""
         return self._price > product.price
 
     def __ge__(self, product):
+        """Check if the product is as expensive or more than another."""
         return self._price >= product.price
 
     def __le__(self, product):
+        """Check if the product is as cheap or cheaper than another."""
         return self._price <= product.price
 
     def __eq__(self, product):
+        """Check if the product price is equal to another."""
         return self._price == product.price
 
     @property
     def price(self):
+        """Get the price of the product."""
         return self._price
 
     @price.setter
     def price(self, price):
+        """
+        Set the price of the product.
+
+        :param price: New price for the product.
+        :raises TypeError: If the price is not a number.
+        :raises ValueError: If the price is negative.
+        """
         if not isinstance(price, (int, float)):
             raise TypeError(f"Price needs to be an integer or a float number: {type(price).__name__} was given")
         if price < 0:
             raise ValueError("Price needs to be positive")
-
         self._price = price
 
     @property
     def name(self):
+        """Get the name of the product."""
         return self._name
 
     @property
     def quantity(self):
         """
-        Returns the current quantity of the product.
+        Get the current quantity of the product.
 
         :return: int, quantity of product.
         """
@@ -82,10 +95,11 @@ class Product:
     @quantity.setter
     def quantity(self, quantity):
         """
-        Updates the product quantity and deactivates the product if quantity reaches 0.
+        Set the quantity of the product and deactivate if quantity is zero.
 
         :param quantity: Quantity to add/subtract from the current stock.
-        :return: True if the quantity was updated, False if not enough in stock.
+        :raises TypeError: If the quantity is not an integer.
+        :raises ValueError: If the quantity is negative.
         """
         if not isinstance(quantity, int):
             raise TypeError(f"Quantity needs to be an integer: {type(quantity).__name__} was given")
@@ -99,39 +113,40 @@ class Product:
     @property
     def is_active(self):
         """
-        Checks if the product is active (i.e., in stock).
+        Check if the product is active (i.e., in stock).
 
         :return: bool, True if active, False otherwise.
         """
         return self._active
 
     def activate(self):
-        """
-        Activates the product, marking it as in stock.
-        """
+        """Activate the product, marking it as in stock."""
         self._active = True
 
     def deactivate(self):
-        """
-        Deactivates the product, marking it as out of stock.
-        """
+        """Deactivate the product, marking it as out of stock."""
         self._active = False
 
     @property
     def promotion(self):
+        """Get the current promotion associated with the product."""
         return self._member
 
     @promotion.setter
     def promotion(self, promotion):
+        """
+        Set a promotion for the product.
+
+        :param promotion: Instance of Promotion.
+        :raises TypeError: If the promotion is not an instance of Promotion.
+        """
         if not isinstance(promotion, Promotion):
-            raise TypeError(f"Promotion needs to be an Instance form class Promotion: "
+            raise TypeError(f"Promotion needs to be an instance of class Promotion: "
                             f"{type(promotion).__name__} was given")
         self._member = promotion
 
     def __str__(self):
-        """
-        Displays product details including name, price, and quantity.
-        """
+        """Display product details including name, price, and quantity."""
         return f"{self._name}, Price: {self._price}$, Quantity: {self._quantity}, Promotion: {self._member}"
 
     def buy(self, quantity):
@@ -140,7 +155,8 @@ class Product:
 
         :param quantity: Number of items to buy.
         :return: Total price for the purchase.
-        :raises ValueError: If not enough items are in stock.
+        :raises TypeError: If the quantity is not an integer.
+        :raises ValueError: If not enough items are in stock or quantity is negative.
         """
         if not isinstance(quantity, int):
             raise TypeError(f"Quantity needs to be an integer: {type(quantity).__name__} was given")
@@ -166,12 +182,18 @@ class NonStockedProduct(Product):
         self._active = True
 
     def __str__(self):
-        """
-        Displays product details including name, price, and quantity.
-        """
+        """Display product details including name, price, and promotion."""
         return f"{self._name}, Price: {self._price}$, Promotion: {self._member}"
 
     def buy(self, quantity):
+        """
+        Processes the purchase for non-stocked products.
+
+        :param quantity: Number of items to buy.
+        :return: Total price for the purchase.
+        :raises TypeError: If the quantity is not an integer.
+        :raises ValueError: If quantity is negative.
+        """
         if not isinstance(quantity, int):
             raise TypeError(f"Quantity needs to be an integer: {type(quantity).__name__} was given")
         if quantity < 0:
@@ -195,10 +217,18 @@ class LimitedProduct(Product):
 
     @property
     def limit(self):
+        """Get the purchase limit for the product."""
         return self._limit
 
     @limit.setter
     def limit(self, limit):
+        """
+        Set the purchase limit for the product.
+
+        :param limit: New limit for the product.
+        :raises TypeError: If the limit is not an integer.
+        :raises ValueError: If the limit is negative.
+        """
         if not isinstance(limit, int):
             raise TypeError(f"Limit needs to be an integer: {type(limit).__name__} was given")
         if limit < 0:
@@ -206,6 +236,14 @@ class LimitedProduct(Product):
         self._limit = limit
 
     def buy(self, quantity):
+        """
+        Processes the purchase considering the limit.
+
+        :param quantity: Number of items to buy.
+        :return: Total price for the purchase.
+        :raises TypeError: If the quantity is not an integer.
+        :raises ValueError: If quantity is negative or exceeds limit.
+        """
         if not isinstance(quantity, int):
             raise TypeError(f"Quantity needs to be an integer: {type(quantity).__name__} was given")
         if quantity < 0:
