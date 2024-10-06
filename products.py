@@ -36,7 +36,7 @@ class Product:
         self._price = float(price)
         self._active = True
         self._member = None
-        self._quantity = quantity  # Corrected to set _quantity directly
+        self.quantity = quantity
 
     def __lt__(self, product):
         """Check if the product is cheaper than another."""
