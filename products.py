@@ -104,3 +104,56 @@ class Product:
         total_price = self.price * quantity
         self.set_quantity(self.quantity - quantity)
         return total_price
+
+
+class NonStockedProduct(Product):
+    def __init__(self, name, price):
+        super().__init__(name, price, quantity=0)
+        self.active = True
+
+    def show(self):
+        """
+        Displays product details including name, price, and quantity.
+        """
+        return f"{self.name}, Price: {self.price}$"
+
+    def buy(self, quantity):
+        if not isinstance(quantity, int):
+            raise TypeError(f"Quantity needs to be an integer: {type(quantity).__name__} was given")
+        if quantity < 0:
+            raise ValueError("Quantity needs to be positive")
+
+        total_price = self.price * quantity
+        return total_price
+
+
+class LimitedProduct(Product):
+    def __init__(self, name, price, quantity, limit):
+        super().__init__(name, price, quantity)
+        if not isinstance(limit, int):
+            raise TypeError(f"Limit needs to be an integer: {type(limit).__name__} was given")
+        if limit < 0:
+            raise ValueError("Limit needs to be positive")
+        self.limit = limit
+
+    def get_limit(self):
+        return self.limit
+
+    def set_limit(self, limit):
+        if not isinstance(limit, int):
+            raise TypeError(f"Limit needs to be an integer: {type(limit).__name__} was given")
+        if limit < 0:
+            raise ValueError("Limit needs to be positive")
+        self.limit = limit
+
+    def buy(self, quantity):
+        if not isinstance(quantity, int):
+            raise TypeError(f"Quantity needs to be an integer: {type(quantity).__name__} was given")
+        if quantity < 0:
+            raise ValueError("Quantity needs to be positive")
+        if self.limit < quantity:
+            raise ValueError(f"Quantity needs to be in range of the Limit ({self.limit})")
+
+        total_price = self.price * quantity
+        self.set_quantity(self.quantity - quantity)
+        return total_price

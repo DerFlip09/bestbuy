@@ -60,6 +60,19 @@ def test_buy_too_many_products():
     with pytest.raises(ValueError, match=f"Not enough quantity in stock for {ipod.name}"):
         ipod.buy(200)
 
+def test_buy_nonstockproduct():
+    windows = NonStockedProduct("Windows Licence", price=150)
+    assert windows.buy(100) == 15000
+
+def test_buy_limitedproduct():
+    shipping = LimitedProduct("Shipping", price=10, quantity=20, limit=1)
+    assert shipping.buy(1) == 10
+
+def test_buy_out_of_limit():
+    shipping = LimitedProduct("Shipping", price=10, quantity=20, limit=1)
+    with pytest.raises(ValueError, match="Quantity needs to be "):
+        shipping.buy(2)
+
 
 if __name__ == '__main__':
     pytest.main()
