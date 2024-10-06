@@ -1,3 +1,6 @@
+from promotions import *
+
+
 class Product:
     """
     A class representing a product with name, price, and quantity.
@@ -32,6 +35,7 @@ class Product:
         self.name = name
         self.price = float(price)
         self.active = True
+        self.member = None
         self.set_quantity(quantity)
 
     def get_quantity(self):
@@ -78,11 +82,20 @@ class Product:
         """
         self.active = False
 
+    def get_promotion(self):
+        return self.member
+
+    def set_promotion(self, promotion):
+        if not isinstance(promotion, Promotion):
+            raise TypeError(f"Promotion needs to be an Instance form class Promotion: "
+                            f"{type(promotion).__name__} was given")
+        self.member = promotion
+
     def show(self):
         """
         Displays product details including name, price, and quantity.
         """
-        return f"{self.name}, Price: {self.price}$, Quantity: {self.quantity}"
+        return f"{self.name}, Price: {self.price}$, Quantity: {self.quantity}, Promotion: {self.member}"
 
     def buy(self, quantity):
         """
@@ -100,6 +113,10 @@ class Product:
             raise TypeError(f"Product {self.name} is not active")
         if quantity > self.quantity:
             raise ValueError(f"Not enough quantity in stock for {self.name}")
+        if self.member is not None:
+            total_price = self.member.apply_promotion(product=self, quantity=quantity)
+            self.set_quantity(self.quantity - quantity)
+            return total_price
 
         total_price = self.price * quantity
         self.set_quantity(self.quantity - quantity)
@@ -115,13 +132,16 @@ class NonStockedProduct(Product):
         """
         Displays product details including name, price, and quantity.
         """
-        return f"{self.name}, Price: {self.price}$"
+        return f"{self.name}, Price: {self.price}$, Promotion: {self.member}"
 
     def buy(self, quantity):
         if not isinstance(quantity, int):
             raise TypeError(f"Quantity needs to be an integer: {type(quantity).__name__} was given")
         if quantity < 0:
             raise ValueError("Quantity needs to be positive")
+        if self.member is not None:
+            total_price = self.member.apply_promotion(product=self, quantity=quantity)
+            return total_price
 
         total_price = self.price * quantity
         return total_price
@@ -153,6 +173,10 @@ class LimitedProduct(Product):
             raise ValueError("Quantity needs to be positive")
         if self.limit < quantity:
             raise ValueError(f"Quantity needs to be in range of the Limit ({self.limit})")
+        if self.member is not None:
+            total_price = self.member.apply_promotion(product=self, quantity=quantity)
+            self.set_quantity(self.quantity - quantity)
+            return total_price
 
         total_price = self.price * quantity
         self.set_quantity(self.quantity - quantity)

@@ -1,5 +1,6 @@
 import pytest
 from products import *
+from promotions import *
 
 
 #Test that creating a normal product works.
@@ -72,6 +73,12 @@ def test_buy_out_of_limit():
     shipping = LimitedProduct("Shipping", price=10, quantity=20, limit=1)
     with pytest.raises(ValueError, match="Quantity needs to be "):
         shipping.buy(2)
+
+def test_apply_promotion():
+    ipod = Product("Ipod", price=100, quantity=150)
+    second_for_half = SecondHalfPrice("Second for half!")
+    ipod.set_promotion(second_for_half)
+    assert isinstance(ipod.get_promotion(), Promotion)
 
 
 if __name__ == '__main__':

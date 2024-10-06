@@ -1,4 +1,4 @@
-from products import Product
+from products import Product, NonStockedProduct
 
 
 class Store:
@@ -71,7 +71,7 @@ class Store:
                 raise ValueError(f"{product.name} is not active in the store")
 
             quantity = sum(quant for prod, quant in shopping_list if prod == product)
-            if quantity > product.quantity:
+            if quantity > product.quantity and not isinstance(product, NonStockedProduct):
                 raise ValueError(f"Quantity of purchase to high for {product.name}")
 
         total_price = 0
