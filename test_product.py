@@ -1,6 +1,7 @@
 import pytest
 from products import *
 from promotions import *
+from store import *
 
 
 #Test that creating a normal product works.
@@ -42,23 +43,24 @@ def test_wrong_type_quantity():
 #Test that when a product reaches 0 quantity, it becomes inactive.
 def test_inactivation():
     ipod = Product("Ipod", price=100, quantity=0)
-    assert ipod.is_active() is False
+    assert not ipod.is_active
     ipad = Product("Ipad", price=100, quantity=150)
-    ipad.set_quantity(0)
-    assert ipod.is_active() is False
+    assert ipad.is_active
+    ipad.quantity = 0
+    assert not ipod.is_active
 
 
 #Test that product purchase modifies the quantity and returns the right output.
 def test_buy_product():
     ipod = Product("Ipod", price=100, quantity=150)
     ipod.buy(100)
-    assert ipod.quantity == 50
+    assert ipod._quantity == 50
 
 
 #Test that buying a larger quantity than exists invokes exception.
 def test_buy_too_many_products():
     ipod = Product("Ipod", price=100, quantity=150)
-    with pytest.raises(ValueError, match=f"Not enough quantity in stock for {ipod.name}"):
+    with pytest.raises(ValueError, match=f"Not enough quantity in stock for {ipod._name}"):
         ipod.buy(200)
 
 def test_buy_nonstockproduct():
@@ -77,9 +79,23 @@ def test_buy_out_of_limit():
 def test_apply_promotion():
     ipod = Product("Ipod", price=100, quantity=150)
     second_for_half = SecondHalfPrice("Second for half!")
-    ipod.set_promotion(second_for_half)
-    assert isinstance(ipod.get_promotion(), Promotion)
+    ipod.promotion = second_for_half
+    assert isinstance(ipod.promotion, Promotion)
 
+def test_if_product_in_store():
+    ipod = Product("Ipod", price=100, quantity=150)
+    best_buy = Store([ipod])
+    assert ipod in best_buy
+
+def test_lower_than():
+    ipod = Product("Ipod", price=100, quantity=150)
+    ipad = Product("Ipod", price=150, quantity=150)
+    assert ipod < ipad
+
+def test_greater_than():
+    ipod = Product("Ipod", price=100, quantity=150)
+    ipad = Product("Ipod", price=150, quantity=150)
+    assert ipad > ipod
 
 if __name__ == '__main__':
     pytest.main()

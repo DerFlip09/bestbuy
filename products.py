@@ -32,21 +32,55 @@ class Product:
             raise ValueError("Quantity needs to be positive")
 
         # Instance Variables
-        self.name = name
-        self.price = float(price)
-        self.active = True
-        self.member = None
-        self.set_quantity(quantity)
+        self._name = name
+        self._price = float(price)
+        self._active = True
+        self._member = None
+        self.quantity = quantity
 
-    def get_quantity(self):
+    def __lt__(self, product):
+        return self._price < product.price
+
+    def __gt__(self, product):
+        return self._price > product.price
+
+    def __ge__(self, product):
+        return self._price >= product.price
+
+    def __le__(self, product):
+        return self._price <= product.price
+
+    def __eq__(self, product):
+        return self._price == product.price
+
+    @property
+    def price(self):
+        return self._price
+
+    @price.setter
+    def price(self, price):
+        if not isinstance(price, (int, float)):
+            raise TypeError(f"Price needs to be an integer or a float number: {type(price).__name__} was given")
+        if price < 0:
+            raise ValueError("Price needs to be positive")
+
+        self._price = price
+
+    @property
+    def name(self):
+        return self._name
+
+    @property
+    def quantity(self):
         """
         Returns the current quantity of the product.
 
         :return: int, quantity of product.
         """
-        return self.quantity
+        return self._quantity
 
-    def set_quantity(self, quantity):
+    @quantity.setter
+    def quantity(self, quantity):
         """
         Updates the product quantity and deactivates the product if quantity reaches 0.
 
@@ -58,44 +92,47 @@ class Product:
         if quantity < 0:
             raise ValueError("Quantity needs to be positive")
 
-        self.quantity = quantity
-        if self.quantity == 0:
+        self._quantity = quantity
+        if self._quantity == 0:
             self.deactivate()
 
+    @property
     def is_active(self):
         """
         Checks if the product is active (i.e., in stock).
 
         :return: bool, True if active, False otherwise.
         """
-        return self.active
+        return self._active
 
     def activate(self):
         """
         Activates the product, marking it as in stock.
         """
-        self.active = True
+        self._active = True
 
     def deactivate(self):
         """
         Deactivates the product, marking it as out of stock.
         """
-        self.active = False
+        self._active = False
 
-    def get_promotion(self):
-        return self.member
+    @property
+    def promotion(self):
+        return self._member
 
-    def set_promotion(self, promotion):
+    @promotion.setter
+    def promotion(self, promotion):
         if not isinstance(promotion, Promotion):
             raise TypeError(f"Promotion needs to be an Instance form class Promotion: "
                             f"{type(promotion).__name__} was given")
-        self.member = promotion
+        self._member = promotion
 
-    def show(self):
+    def __str__(self):
         """
         Displays product details including name, price, and quantity.
         """
-        return f"{self.name}, Price: {self.price}$, Quantity: {self.quantity}, Promotion: {self.member}"
+        return f"{self._name}, Price: {self._price}$, Quantity: {self._quantity}, Promotion: {self._member}"
 
     def buy(self, quantity):
         """
@@ -109,41 +146,41 @@ class Product:
             raise TypeError(f"Quantity needs to be an integer: {type(quantity).__name__} was given")
         if quantity < 0:
             raise ValueError("Quantity needs to be positive")
-        if not self.is_active():
-            raise TypeError(f"Product {self.name} is not active")
-        if quantity > self.quantity:
-            raise ValueError(f"Not enough quantity in stock for {self.name}")
-        if self.member is not None:
-            total_price = self.member.apply_promotion(product=self, quantity=quantity)
-            self.set_quantity(self.quantity - quantity)
+        if not self.is_active:
+            raise TypeError(f"Product {self._name} is not active")
+        if quantity > self._quantity:
+            raise ValueError(f"Not enough quantity in stock for {self._name}")
+        if self._member is not None:
+            total_price = self._member.apply_promotion(product=self, quantity=quantity)
+            self._quantity -= quantity
             return total_price
 
-        total_price = self.price * quantity
-        self.set_quantity(self.quantity - quantity)
+        total_price = self._price * quantity
+        self._quantity -= quantity
         return total_price
 
 
 class NonStockedProduct(Product):
     def __init__(self, name, price):
         super().__init__(name, price, quantity=0)
-        self.active = True
+        self._active = True
 
-    def show(self):
+    def __str__(self):
         """
         Displays product details including name, price, and quantity.
         """
-        return f"{self.name}, Price: {self.price}$, Promotion: {self.member}"
+        return f"{self._name}, Price: {self._price}$, Promotion: {self._member}"
 
     def buy(self, quantity):
         if not isinstance(quantity, int):
             raise TypeError(f"Quantity needs to be an integer: {type(quantity).__name__} was given")
         if quantity < 0:
             raise ValueError("Quantity needs to be positive")
-        if self.member is not None:
-            total_price = self.member.apply_promotion(product=self, quantity=quantity)
+        if self._member is not None:
+            total_price = self._member.apply_promotion(product=self, quantity=quantity)
             return total_price
 
-        total_price = self.price * quantity
+        total_price = self._price * quantity
         return total_price
 
 
@@ -154,30 +191,32 @@ class LimitedProduct(Product):
             raise TypeError(f"Limit needs to be an integer: {type(limit).__name__} was given")
         if limit < 0:
             raise ValueError("Limit needs to be positive")
-        self.limit = limit
+        self._limit = limit
 
-    def get_limit(self):
-        return self.limit
+    @property
+    def limit(self):
+        return self._limit
 
-    def set_limit(self, limit):
+    @limit.setter
+    def limit(self, limit):
         if not isinstance(limit, int):
             raise TypeError(f"Limit needs to be an integer: {type(limit).__name__} was given")
         if limit < 0:
             raise ValueError("Limit needs to be positive")
-        self.limit = limit
+        self._limit = limit
 
     def buy(self, quantity):
         if not isinstance(quantity, int):
             raise TypeError(f"Quantity needs to be an integer: {type(quantity).__name__} was given")
         if quantity < 0:
             raise ValueError("Quantity needs to be positive")
-        if self.limit < quantity:
-            raise ValueError(f"Quantity needs to be in range of the Limit ({self.limit})")
-        if self.member is not None:
-            total_price = self.member.apply_promotion(product=self, quantity=quantity)
-            self.set_quantity(self.quantity - quantity)
+        if self._limit < quantity:
+            raise ValueError(f"Quantity needs to be in range of the Limit ({self._limit})")
+        if self._member is not None:
+            total_price = self._member.apply_promotion(product=self, quantity=quantity)
+            self.quantity -= quantity
             return total_price
 
-        total_price = self.price * quantity
-        self.set_quantity(self.quantity - quantity)
+        total_price = self._price * quantity
+        self.quantity -= quantity
         return total_price

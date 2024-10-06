@@ -15,7 +15,13 @@ class Store:
         if not all(isinstance(product, Product) for product in products):
             raise TypeError("Every product in products needs to be an instance of Product")
 
-        self.products = products
+        self._products = products
+
+    def __contains__(self, product):
+        return product in self._products
+
+    def __add__(self, store):
+        return Store(self._products + store.all_products)
 
     def add_product(self, products):
         """
@@ -23,7 +29,7 @@ class Store:
 
         :param products: List of products to be added to the store.
         """
-        self.products += products
+        self._products += products
 
     def remove_product(self, product):
         """
@@ -31,28 +37,30 @@ class Store:
 
         :param product: The product to be removed.
         """
-        self.products.remove(product)
+        self._products.remove(product)
 
-    def get_total_quantity(self):
+    @property
+    def total_quantity(self):
         """
         Calculates the total quantity of all products in the store.
 
         :return: int, total quantity of items.
         """
         total_quantity = 0
-        for product in self.products:
-            total_quantity += product.get_quantity()
+        for product in self._products:
+            total_quantity += product.quantity
         return total_quantity
 
-    def get_all_products(self):
+    @property
+    def all_products(self):
         """
         Retrieves all active products (in stock) from the store.
 
         :return: List of active products.
         """
         active_products = []
-        for product in self.products:
-            if product.is_active():
+        for product in self._products:
+            if product.is_active:
                 active_products.append(product)
         return active_products
 
@@ -65,9 +73,9 @@ class Store:
         :raises ValueError: If there is not enough stock to fulfill the order.
         """
         for product, _ in shopping_list:
-            if product not in self.products:
+            if product not in self._products:
                 raise ValueError(f"{product.name} not in store")
-            if not product.is_active():
+            if not product.is_active:
                 raise ValueError(f"{product.name} is not active in the store")
 
             quantity = sum(quant for prod, quant in shopping_list if prod == product)

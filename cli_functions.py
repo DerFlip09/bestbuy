@@ -4,11 +4,11 @@ def show_items(store_obj):
 
     :param store_obj: Store object containing products.
     """
-    products_list = store_obj.get_all_products()
+    products_list = store_obj.all_products
     item_number = 1
     print(8 * "-")
     for product in products_list:
-        print(f"{item_number}. {product.show()}")
+        print(f"{item_number}. {product}")
         item_number += 1
     print(8 * "-")
 
@@ -20,7 +20,7 @@ def show_total_amount(store_obj):
     :param store_obj: Store object containing products.
     """
     print(8 * "-")
-    print(f"Total of {store_obj.get_total_quantity()} items in store")
+    print(f"Total of {store_obj.total_quantity} items in store")
     print(8 * "-")
 
 
@@ -72,7 +72,7 @@ def print_shopping_cart(order_list):
                            order_list if prod == product)
             controlled_items.append(product)
             complete_order_list.append((product, quantity))
-    shopping_cart = "\n".join(f"{i+1}. {product.name}, Price: {product.price},"
+    shopping_cart = "\n".join(f"{i+1}. {product.name}, Price: {product.price}, "
                               f"Quantity: {quantity}" for i, (product, quantity) in
                               enumerate(complete_order_list))
     shopping_cart = shopping_cart or "Empty"
@@ -98,7 +98,7 @@ def place_an_order(store_obj):
     :param store_obj: Store object containing products.
     """
 
-    products_list = store_obj.get_all_products()
+    products_list = store_obj.all_products
     order_list = []
 
     show_items(store_obj)
