@@ -95,5 +95,5 @@ class PercentDiscount(Promotion):
         :param quantity: The quantity of the product being purchased.
         :return: Total price after applying the percentage discount promotion.
         """
-        disc_multiplier = (self.percent / 100) + 1
+        disc_multiplier = 1 - (self.percent / 100)
         return (product.price * quantity) * disc_multiplier
